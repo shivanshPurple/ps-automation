@@ -6,14 +6,15 @@ import glob
 import random
 
 cwd = os.getcwd()
-mockups = {1: {"loc": "C:\\Users\\asus\\Desktop\\mockup1.psd",
-               "smartObjLoc": "C:\\Users\\asus\\AppData\\Local\\Temp\\Capa 1412111.psb",
+folder = "Coffee Tshirt Design"
+mockups = {1: {"loc": f"{cwd}\\mockup1.psd",
+               "smartObjLoc": "C:\\Users\\asus\\AppData\\Local\\Temp\\Capa 141211.psb",
                "smartObjSize": (714, 824)},
-           2: {"loc": "C:\\Users\\asus\\Desktop\\mockup2.psd",
+           2: {"loc": f"{cwd}\\mockup2.psd",
                "smartObjLoc": "C:\\Users\\asus\\AppData\\Local\\Temp\\Capa 1102.psb",
                "smartObjSize": (948, 1240)},
-           3: {"loc": "C:\\Users\\asus\\Desktop\\mockup3.psd",
-               "smartObjLoc": "C:\\Users\\asus\\AppData\\Local\\Temp\\Capa 1412112.psb",
+           3: {"loc": f"{cwd}\\mockup3.psd",
+               "smartObjLoc": "C:\\Users\\asus\\AppData\\Local\\Temp\\Capa 1412111.psb",
                "smartObjSize": (714, 824)}}
 
 # open photoshop and smartobject
@@ -21,7 +22,7 @@ psApp = win32com.client.Dispatch("Photoshop.Application")
 print("Opened photoshop")
 
 # load and paste image
-allPngs = glob.glob("C:\\Users\\asus\\Desktop\\Back to School" +
+allPngs = glob.glob(f"{cwd}\\{folder}" +
                     "/**/*.png", recursive=True)
 print(f"Found {len(allPngs)} png to paste on mockup")
 i = 1
@@ -30,6 +31,9 @@ i = 1
 for png in allPngs:
     pngName = png.split("\\")[-1]
     rand = random.randint(1, len(mockups))
+    # rand = 1
+    print(
+        f"exported tshirt {i} of {len(allPngs)} ({int(i/len(allPngs)*100)}%) to mockup {rand}")
     tshirt = psApp.Open(mockups[rand]["loc"])
     smartObject = psApp.Open(mockups[rand]["smartObjLoc"])
     psApp.Load(png)
@@ -54,24 +58,23 @@ for png in allPngs:
     options.Format = 6
     options.Quality = 100
 
-    jpgFile = f"C:\\Users\\asus\\Desktop\\{pngName}-Mockup.jpg"
+    jpgFile = f"{cwd}\\export\\{pngName}-Mockup.jpg"
     psApp.ActiveDocument = tshirt
     psApp.ActiveDocument.Export(ExportIn=jpgFile, ExportAs=2, Options=options)
     psApp.ActiveDocument.Save()
-    print(
-        f"exported tshirt {i} of {len(allPngs)} ({int(i/len(allPngs)*100)}%)")
+    print("Done!")
     i += 1
 
 
 allPngs = [i.split("\\")[-1] for i in allPngs]
 
 columns = ['Folder', 'File', 'Posted']
-df = pd.DataFrame({'Folder': {0: "Back to School"},
+df = pd.DataFrame({'Folder': {0: f"{folder}"},
                    'File': {0: allPngs[1]},
                    'Posted': {0: "No"}}, columns=columns)
 
 for i in allPngs:
-    df = df.append({'Folder': "Back to School",
+    df = df.append({'Folder': f"{folder}",
                     'File': i,
                     'Posted': "No"}, ignore_index=True)
 
